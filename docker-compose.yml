@@ -1,17 +1,17 @@
 version: "3"
 services:
-  database:
-    image: postgres:latest
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=1234
-      - PGDATA=/data/postgres
-      - POSTGRES_DB=iot
-    ports:
-      - "5432:5432"
-    volumes:
-      - database:/var/lib/pgql
+  # database:
+  #   image: postgres:latest
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=1234
+  #     - PGDATA=/data/postgres
+  #     - POSTGRES_DB=iot
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - database:/var/lib/pgql
 
   cache:
     image: redis:6.2-alpine
@@ -20,6 +20,8 @@ services:
       - '6379:6379'
     volumes:
       - cache:/data
+    networks:
+      - docker_network
   mqtt-ws-broker:
     build: .
     env_file:
@@ -29,56 +31,34 @@ services:
       - "8080:8080"
     networks:
       - docker_network
-  iot-platform-be:
-    build: 
-      context: services/iot-platform-go
-      dockerfile: ../iot-platform-go/Dockerfile
-    env_file:
-      - .env.docker
-    ports:
-      - "1883:1883"
-      - "8080:8080"
-    networks:
-      - docker_network
-  iot-platform-fe:
-    build: 
-      context: services/iot-platform-next
-      dockerfile: ../iot-platform-next/Dockerfile
-    env_file:
-      - .env.docker
-    volumes:
-      - .:/app
-    command: npm run dev
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: development
-    networks:
-      - docker_network
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana-server
-    restart: always
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=1234abcd@@
-      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-mqtt-datasource
-    ports:
-      - 3001:3000
-    volumes:
-      - grafana-plugin:/grafana_plugins:/var/lib/grafana/plugins
-      - grafana-data:/grafana_data:/var/lib/grafana
-    networks:
-      - docker_network
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana-server
+  #   restart: always
+  #   environment:
+  #     - GF_SECURITY_ADMIN_USER=admin
+  #     - GF_SECURITY_ADMIN_PASSWORD=1234abcd@@
+  #     - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-mqtt-datasource
+  #     - GF_SERVER_PROTOCOL=http
+  #     - GF_SERVER_DOMAIN=uraa.asia
+  #     - GF_SERVER_ROOT_URL=https://uraa.asia/grafana
+  #     - GF_SERVER_SERVE_FROM_SUB_PATH=true
+  #   ports:
+  #     - 3001:3000
+  #   volumes:
+  #     - grafana-plugin:/grafana_plugins:/var/lib/grafana/plugins
+  #     - grafana-data:/grafana_data:/var/lib/grafana
+  #   networks:
+  #     - docker_network
 volumes:
-  grafana-plugin:
-    driver: local
-  grafana-data:
-    driver: local
+  # grafana-plugin:
+  #   driver: local
+  # grafana-data:
+  #   driver: local
   cache:
     driver: local
-  database:
-    driver: local
+  # database:
+  #   driver: local
 networks:
   docker_network:
     driver: bridge
