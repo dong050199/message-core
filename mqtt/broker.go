@@ -31,8 +31,8 @@ func InstanceMQTTBroker() {
 		log.Fatal(err)
 	}
 
-	tcp := listeners.NewTCP("t1", ":1883", nil)
-	err = server.AddListener(tcp)
+	ws := listeners.NewWebsocket("t1", "localhost:1883", nil)
+	err = server.AddListener(ws)
 	if err != nil {
 		log.Fatal(err)
 	}
